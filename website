@@ -1,1 +1,40 @@
 
+import pandas as pd
+
+
+from flask import Flask,render_template,request
+import pickle
+app=Flask(__name__)
+model=pickle.load(open('model.pkl','rb'))
+vector=pickle.load(open('vector.pkl','rb'))
+@app.route('/')
+def home():
+    return render_template('home.html')
+@app.route('/predict',methods=['POST'])
+def predict():
+   Tweet= request.values['Tweet']
+   z=[Tweet]
+   k=pd.DataFrame()
+   k=z
+   k=vector.transform(k)
+   output=model.predict(k)
+   output=output.item()
+   output=int(output)
+
+   if output==1:
+       a='Anger'
+   elif output==2:
+       a='Fear'
+   elif output==3:
+       a='Surprise'
+   elif output==4:
+       a='Joy'
+   elif output==5:
+       a='Sadness'
+   elif output==6:
+       a='Disgust'
+   return render_template ('result.html',prediction_text="The emotion is :  {}".format(a))
+if __name__=='__main__':
+    app.run(port=8000)
+
+
